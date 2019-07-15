@@ -1,0 +1,15 @@
+Neos:
+  Fusion:
+    defaultContext:
+      'Swisscom.ReactIntegration': 'Swisscom\ReactIntegration\Eel\ReactIntegrationHelper'
+
+
+  Neos:
+    fusion:
+      autoInclude:
+        Swisscom.ReactIntegration: true
+
+
+Swisscom:
+  ReactIntegration:
+    productionMode: false

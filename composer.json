@@ -1,0 +1,18 @@
+{
+    "description": "",
+    "type": "neos-package",
+    "name": "swisscom/reactintegration",
+    "require": {
+        "neos/flow": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Swisscom\\ReactIntegration\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "Swisscom.ReactIntegration"
+        }
+    }
+}
