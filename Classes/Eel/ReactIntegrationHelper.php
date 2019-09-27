@@ -56,17 +56,22 @@ class ReactIntegrationHelper implements ProtectedContextAwareInterface
      */
     public function getReactDevelopmentScriptUris($reactDevelopmentServerUri): array
     {
-        $browser = new Browser();
-        $browser->setRequestEngine(new CurlEngine());
-        $response = $browser->request(new \Neos\Flow\Http\Uri($reactDevelopmentServerUri));
-        $content = $response->getContent();
-        $matches = null;
-        preg_match_all(self::SCRIPT_REGEX, $content, $matches, PREG_SET_ORDER);
-        $output = [];
-        foreach ($matches as $match) {
-            $output[] = $reactDevelopmentServerUri . $match[1];
+        try {
+            $browser = new Browser();
+            $browser->setRequestEngine(new CurlEngine());
+            $response = $browser->request(new \Neos\Flow\Http\Uri($reactDevelopmentServerUri));
+            $content = $response->getContent();
+            $matches = null;
+            preg_match_all(self::SCRIPT_REGEX, $content, $matches, PREG_SET_ORDER);
+            $output = [];
+            foreach ($matches as $match) {
+                $output[] = $reactDevelopmentServerUri . $match[1];
+            }
+            return $output;
+        } catch (\Exception $exceptione) {
+            return [];
         }
-        return $output;
+
     }
 
     /**
