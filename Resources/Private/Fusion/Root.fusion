@@ -1,7 +1,16 @@
 prototype(Swisscom.ReactIntegration:ReactScripts) < prototype(Neos.Fusion:Component) {
     // Public API
+
+    // Path to the COMPILED resources (used when productionMode == true)
     path = 'resource://Your.Package/Public/...'
+
+    // Path to the development server to extract the JavaScript from. This URL must be reachable
+    // from within PHP!
     developmentServerUrl = 'http://127.0.0.1:3000'
+
+    // In case the dev server is accessed through a different host from the browser,
+    // add this URL here.
+    publicDevelopmentServerUrl = ${this.developmentServerUrl}
 
     // Private
     _scriptUrls = ${Configuration.setting("Swisscom.ReactIntegration.productionMode") ? Swisscom.ReactIntegration.getCompiledReactScriptUris(this.path, 'js') : Swisscom.ReactIntegration.getReactDevelopmentScriptUris(this.developmentServerUrl)}

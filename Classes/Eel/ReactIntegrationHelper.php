@@ -52,10 +52,14 @@ class ReactIntegrationHelper implements ProtectedContextAwareInterface
 
     /**
      * @param string $reactDevelopmentServerUri http://localhost:3000
+     * @param string $publicDevelopmentServerUri http://localhost:3000
      * @return string
      */
-    public function getReactDevelopmentScriptUris($reactDevelopmentServerUri): array
+    public function getReactDevelopmentScriptUris($reactDevelopmentServerUri, $publicDevelopmentServerUri = null): array
     {
+        if ($publicDevelopmentServerUri === null) {
+            $publicDevelopmentServerUri = $reactDevelopmentServerUri;
+        }
         try {
             $browser = new Browser();
             $browser->setRequestEngine(new CurlEngine());
@@ -65,10 +69,10 @@ class ReactIntegrationHelper implements ProtectedContextAwareInterface
             preg_match_all(self::SCRIPT_REGEX, $content, $matches, PREG_SET_ORDER);
             $output = [];
             foreach ($matches as $match) {
-                $output[] = $reactDevelopmentServerUri . $match[1];
+                $output[] = $publicDevelopmentServerUri . $match[1];
             }
             return $output;
-        } catch (\Exception $exceptione) {
+        } catch (\Exception $exception) {
             return [];
         }
 
