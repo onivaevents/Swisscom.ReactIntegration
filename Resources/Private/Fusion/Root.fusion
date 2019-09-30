@@ -13,7 +13,7 @@ prototype(Swisscom.ReactIntegration:ReactScripts) < prototype(Neos.Fusion:Compon
     publicDevelopmentServerUrl = ${this.developmentServerUrl}
 
     // Private
-    _scriptUrls = ${Configuration.setting("Swisscom.ReactIntegration.productionMode") ? Swisscom.ReactIntegration.getCompiledReactScriptUris(this.path, 'js') : Swisscom.ReactIntegration.getReactDevelopmentScriptUris(this.developmentServerUrl)}
+    _scriptUrls = ${Configuration.setting("Swisscom.ReactIntegration.productionMode") ? Swisscom.ReactIntegration.getCompiledReactScriptUris(this.path, 'js') : Swisscom.ReactIntegration.getReactDevelopmentScriptUris(this.developmentServerUrl, this.publicDevelopmentServerUrl)}
 
     renderer = afx`
         <Neos.Fusion:Loop items={props._scriptUrls} itemName="scriptUrl">
