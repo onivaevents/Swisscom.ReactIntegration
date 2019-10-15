@@ -1,8 +1,9 @@
 prototype(Swisscom.ReactIntegration:ReactScripts) < prototype(Neos.Fusion:Component) {
     // Public API
 
-    // Path to the COMPILED resources (used when productionMode == true)
-    path = 'resource://Your.Package/Public/...'
+    // Paths to the COMPILED resources (used when productionMode == true)
+    jsPath = 'resource://Your.Package/Public/static/js'
+    cssPath = 'resource://Your.Package/Public/static/css'
 
     // Path to the development server to extract the JavaScript from. This URL must be reachable
     // from within PHP!
@@ -13,9 +14,14 @@ prototype(Swisscom.ReactIntegration:ReactScripts) < prototype(Neos.Fusion:Compon
     publicDevelopmentServerUrl = ${this.developmentServerUrl}
 
     // Private
-    _scriptUrls = ${Configuration.setting("Swisscom.ReactIntegration.productionMode") ? Swisscom.ReactIntegration.getCompiledReactScriptUris(this.path, 'js') : Swisscom.ReactIntegration.getReactDevelopmentScriptUris(this.developmentServerUrl, this.publicDevelopmentServerUrl)}
+    _scriptUrls = ${Configuration.setting("Swisscom.ReactIntegration.productionMode") ? Swisscom.ReactIntegration.getCompiledReactScriptUris(this.jsPath, 'js') : Swisscom.ReactIntegration.getReactDevelopmentScriptUris(this.developmentServerUrl, this.publicDevelopmentServerUrl)}
+    // We only need to include css in production because react-scripts already includes css via js in development.
+    _cssUrls = ${Configuration.setting("Swisscom.ReactIntegration.productionMode") ? Swisscom.ReactIntegration.getCompiledReactScriptUris(this.cssPath, 'css') : []}
 
     renderer = afx`
+        <Neos.Fusion:Loop items={props._cssUrls} itemName="cssUrl">
+            <link rel="stylesheet" type="text/css" href={cssUrl}/>
+        </Neos.Fusion:Loop>
         <Neos.Fusion:Loop items={props._scriptUrls} itemName="scriptUrl">
             <script type="application/javascript" src={scriptUrl}></script>
         </Neos.Fusion:Loop>
