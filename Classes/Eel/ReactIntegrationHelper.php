@@ -3,6 +3,7 @@
 
 namespace Swisscom\ReactIntegration\Eel;
 
+use GuzzleHttp\Psr7\Uri;
 use Neos\Flow\Annotations as Flow;
 use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\Http\Client\Browser;
@@ -63,8 +64,8 @@ class ReactIntegrationHelper implements ProtectedContextAwareInterface
         try {
             $browser = new Browser();
             $browser->setRequestEngine(new CurlEngine());
-            $response = $browser->request(new \Neos\Flow\Http\Uri($reactDevelopmentServerUri));
-            $content = $response->getContent();
+            $response = $browser->request(new Uri($reactDevelopmentServerUri));
+            $content = $response->getBody();
             $matches = null;
             preg_match_all(self::SCRIPT_REGEX, $content, $matches, PREG_SET_ORDER);
             $output = [];
