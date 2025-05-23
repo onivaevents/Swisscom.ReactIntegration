@@ -1,5 +1,6 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Swisscom\ReactIntegration\Eel;
 
@@ -8,12 +9,13 @@ use Neos\Flow\Annotations as Flow;
 use Neos\Eel\ProtectedContextAwareInterface;
 use Neos\Flow\Http\Client\Browser;
 use Neos\Flow\Http\Client\CurlEngine;
+use Neos\Flow\Package\Exception\UnknownPackageException;
 use Neos\Flow\Package\PackageManager;
+use Neos\Flow\ResourceManagement\Exception;
 use Neos\Flow\ResourceManagement\ResourceManager;
 
 class ReactIntegrationHelper implements ProtectedContextAwareInterface
 {
-
     /**
      * @Flow\Inject
      * @var ResourceManager
@@ -26,26 +28,31 @@ class ReactIntegrationHelper implements ProtectedContextAwareInterface
      */
     protected $packageManager;
 
-    const SCRIPT_REGEX = '/<script[^>]*src="([^"]+)"/';
+    const string SCRIPT_REGEX = '/<script[^>]*src="([^"]+)"/';
 
     /**
      * @param string $path in the form of resource://Your.Package/Public/Foo/Bar
      * @param string $fileType in the form of "js"
-     * @return string
-     * @throws \Neos\Flow\Package\Exception\UnknownPackageException
-     * @throws \Neos\Flow\ResourceManagement\Exception
+     * @return string[]
+     * @throws UnknownPackageException
+     * @throws Exception
      */
     public function getCompiledReactScriptUris(string $path, string $fileType): array
     {
         list ($packageKey, $packageRelativePath) = $this->resourceManager->getPackageAndPathByPublicPath($path);
+        if (!is_string($packageKey) || !is_string($packageRelativePath)) {
+            return [];
+        }
+
         $package = $this->packageManager->getPackage($packageKey);
         $folderToCheck = $package->getPackagePath() . 'Resources/Public/' . $packageRelativePath;
-        $files = glob($folderToCheck . '/*.' . $fileType);
 
         $result = [];
-        foreach ($files as $file) {
-            $fileName = basename($file);
-            $result[] = $this->resourceManager->getPublicPackageResourceUriByPath($path . '/' . $fileName);
+        if ($files = glob($folderToCheck . '/*.' . $fileType)) {
+            foreach ($files as $file) {
+                $fileName = basename($file);
+                $result[] = $this->resourceManager->getPublicPackageResourceUriByPath($path . '/' . $fileName);
+            }
         }
 
         return $result;
@@ -53,10 +60,10 @@ class ReactIntegrationHelper implements ProtectedContextAwareInterface
 
     /**
      * @param string $reactDevelopmentServerUri http://localhost:3000
-     * @param string $publicDevelopmentServerUri http://localhost:3000
-     * @return string
+     * @param string|null $publicDevelopmentServerUri http://localhost:3000
+     * @return string[]
      */
-    public function getReactDevelopmentScriptUris($reactDevelopmentServerUri, $publicDevelopmentServerUri = null): array
+    public function getReactDevelopmentScriptUris(string $reactDevelopmentServerUri, ?string $publicDevelopmentServerUri = null): array
     {
         if ($publicDevelopmentServerUri === null) {
             $publicDevelopmentServerUri = $reactDevelopmentServerUri;
@@ -67,13 +74,13 @@ class ReactIntegrationHelper implements ProtectedContextAwareInterface
             $response = $browser->request(new Uri($reactDevelopmentServerUri));
             $content = $response->getBody();
             $matches = null;
-            preg_match_all(self::SCRIPT_REGEX, $content, $matches, PREG_SET_ORDER);
+            preg_match_all(self::SCRIPT_REGEX, (string)$content, $matches, PREG_SET_ORDER);
             $output = [];
             foreach ($matches as $match) {
                 $output[] = $publicDevelopmentServerUri . $match[1];
             }
             return $output;
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
             return [];
         }
 
@@ -83,7 +90,7 @@ class ReactIntegrationHelper implements ProtectedContextAwareInterface
      * @param string $methodName
      * @return boolean
      */
-    public function allowsCallOfMethod($methodName)
+    public function allowsCallOfMethod($methodName): bool
     {
         return true;
     }
