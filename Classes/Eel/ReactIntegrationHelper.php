@@ -28,7 +28,7 @@ class ReactIntegrationHelper implements ProtectedContextAwareInterface
      */
     protected $packageManager;
 
-    const string SCRIPT_REGEX = '/<script[^>]*src="([^"]+)"/';
+    const SCRIPT_REGEX = '/<script[^>]*src="([^"]+)"/';
 
     /**
      * @param string $path in the form of resource://Your.Package/Public/Foo/Bar
